@@ -21,8 +21,7 @@ def index():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return "TODO : Register Get"
-        #return render_template("/register.html")
+        return render_template("/register.html")
 
     if request.method == "POST":
         return "TODO : Register Post"
@@ -33,8 +32,7 @@ def login():
     session.clear()
 
     if request.method == "GET":
-        return "TODO : Login GET"
-        #return render_template("/login.html")
+        return render_template("/login.html")
 
     if request.method == "POST":
         return "TODO : Login POST"
