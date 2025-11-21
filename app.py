@@ -16,11 +16,10 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "GET":
-        # If user is not logedin redirrect to login
         if not session.get("user_id", None):
             return redirect(url_for("login"))
         
-        return f"You are logged in as {session}"
+        return f"You are logged in as {session.get("user_name")}. TODO : View all property"
         
     if request.method == "POST":
         return "TODO : Index : POST : Search"
@@ -80,7 +79,8 @@ def login():
         user = user_list[0]
         if check_password_hash(user.get("password_hash"), password):
             session["user_id"] = user.get("user_id")
-            session["is_admin"] = user.get("is_admin")
+            session["user_name"] = user.get("user_name")
+            session["user_type"] = user.get("type")
             return redirect(url_for("index"))
         else:
             return redirect(url_for("apology", em="Wrong Password"))
@@ -92,7 +92,40 @@ def logout():
     return redirect("login")
 
 
-# em = Error Massage
 @app.route("/apology")
 def apology():
     return render_template("apology.html", em=request.args.get("em", "No Error"))
+
+
+@app.route("/new_property", methods=["GET", "POST"])
+def new_property():
+    if not session.get("user_id", None):
+        return redirect(url_for("login"))
+    
+    if request.method == "GET":
+        return render_template("new_property.html")
+    
+    if request.method == "POST":
+        title = request.form.get("title", None)
+        description = request.form.get("description", None)
+        price = request.form.get("price", None)
+    
+        if not title or not description or not price:
+            return redirect(url_for("apology", em="Please fill all the requred fiedls."))
+        
+        return "TODO"
+
+
+@app.route("/view_property/<int:property_id>", methods=["GET", "POST"])
+def view_property(property_id):
+    if not property_id:
+        return redirect(url_for("apology", em="Missing URL paramiters"))
+
+    if not session.get("user_id", None):
+        return redirect(url_for("login"))
+    
+    if request.method == "GET":
+        return "Render the property"
+    
+    if request.method == "POST":
+        return "Check then book the proparty or unbook the property"

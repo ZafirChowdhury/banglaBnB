@@ -24,4 +24,3 @@ CREATE TABLE property (
     FOREIGN KEY (host_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (rented_to) REFERENCES users(user_id) ON DELETE SET NULL
 );
-
