@@ -8,7 +8,7 @@ CREATE TABLE users (
     PRIMARY KEY (user_id)
 );
 
-CREATE TABLE property (
+CREATE TABLE properties (
     property_id INT NOT NULL AUTO_INCREMENT,
     host_id INT,
 

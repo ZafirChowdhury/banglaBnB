@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import timedelta
 
-import database
+import database, helper
 
 app = Flask(__name__)
 
@@ -110,21 +110,36 @@ def new_property():
         title = request.form.get("title", None)
         description = request.form.get("description", None)
         price = request.form.get("price", None)
+        location = request.form.get("location", None)
     
-        if not title or not description or not price:
+        if not title or not description or not price or not location:
             return redirect(url_for("apology", em="Please fill all the requred fiedls."))
         
-        return "TODO"
+        price = helper.check_is_float_and_convert(price)
+        if not price:
+            return redirect(url_for("apology", em="Wrong Price Format"))
+        
+        # save to database
+        query = '''
+                INSERT INTO properties 
+                (host_id, title, description, location, price)
+                VALUES (%s, %s, %s, %s, %s)
+                '''
+        database.save(query, session.get("user_id", 0), title, description, location, price)
+
+        property_id = database.get("SELECT * FROM properties ORDER BY property_id DESC LIMIT 1", ())[0].get("property_id")
+
+        return redirect(url_for("view_property", property_id=property_id))
 
 
 @app.route("/view_property/<int:property_id>", methods=["GET", "POST"])
 def view_property(property_id):
-    if not property_id:
-        return redirect(url_for("apology", em="Missing URL paramiters"))
-
     if not session.get("user_id", None):
         return redirect(url_for("login"))
     
+    if not property_id:
+        return redirect(url_for("apology", em="Missing URL paramiters"))
+   
     if request.method == "GET":
         return "Render the property"
     
