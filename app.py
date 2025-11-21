@@ -35,8 +35,9 @@ def register():
         email = request.form.get("email", None)
         password = request.form.get("password", None)
         password_again = request.form.get("password_again", None)
+        user_type = request.form.get("user_type", None)
 
-        if not user_name or not email or not password or not password_again:
+        if not user_name or not email or not password or not password_again or not user_type:
             return redirect(url_for("apology", em="Please fill all the requred fields."))
         
         if password != password_again:
@@ -50,8 +51,8 @@ def register():
             return redirect(url_for("apology", em="Username allready taken or email allready in use."))
 
         # Hasing the password and saving the user to the database
-        database.save("INSERT INTO users (user_name, email, password_hash) VALUES (%s, %s, %s)", 
-                      (user_name, email, str(generate_password_hash(password))))
+        database.save("INSERT INTO users (user_name, email, password_hash, type) VALUES (%s, %s, %s, %s)", 
+                      (user_name, email, str(generate_password_hash(password)), user_type))
 
         return redirect("login")
     
