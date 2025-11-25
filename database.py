@@ -18,7 +18,7 @@ def save(query, data):
     return True
 
 
-def get(query, data):
+def get(query, data=None):
     cur = db.cursor(buffered=True, dictionary=True)
 
     cur.execute(query, data)

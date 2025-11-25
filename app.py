@@ -18,11 +18,13 @@ def index():
     if request.method == "GET":
         if not session.get("user_id", None):
             return redirect(url_for("login"))
-        
-        return f"You are logged in as {session.get("user_name")}. TODO : View all property"
-        
+
+        properties = database.get("SELECT * FROM properties ORDER BY property_id DESC LIMIT 20")
+
+        return render_template("home.html", properties=properties)
+
     if request.method == "POST":
-        return "TODO : Index : POST : Search"
+        return "Index:POST - TODO Search"
 
 
 @app.route("/register", methods=["GET", "POST"])
