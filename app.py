@@ -125,7 +125,7 @@ def new_property():
                 (host_id, title, description, location, price)
                 VALUES (%s, %s, %s, %s, %s)
                 '''
-        database.save(query, session.get("user_id", 0), title, description, location, price)
+        database.save(query, (session.get("user_id", 0), title, description, location, price))
 
         property_id = database.get("SELECT * FROM properties ORDER BY property_id DESC LIMIT 1", ())[0].get("property_id")
 
@@ -140,8 +140,14 @@ def view_property(property_id):
     if not property_id:
         return redirect(url_for("apology", em="Missing URL paramiters"))
    
+
     if request.method == "GET":
-        return "Render the property"
+        properties = database.get("SELECT * FROM properties WHERE property_id = %s", (property_id, ))
+    
+        if len(properties) == 0:
+            return redirect(url_for("apology", em="Property dose not exist"))
+        
+        return render_template("/view_listing.html", properties=properties[0])
     
     if request.method == "POST":
         return "Check then book the proparty or unbook the property"
