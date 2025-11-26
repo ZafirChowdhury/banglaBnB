@@ -206,3 +206,13 @@ def unbook(property_id):
     database.save(query, (False, None, property_id))
 
     return redirect(url_for("view_property", property_id=property_id)) 
+
+
+@app.route("/my_propertys", methods=["GET"])
+def my_propertys():
+    return "TODO : My Property"
+
+
+@app.route("/profile", methods=["GET"])
+def profiles():
+    return "TODO : Profiles"
