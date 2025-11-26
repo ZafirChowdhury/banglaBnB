@@ -153,3 +153,51 @@ def view_property(property_id):
     
     if request.method == "POST":
         return "Check then book the proparty or unbook the property"
+
+
+@app.route("/book/<int:property_id>", methods=["POST"])
+def book(property_id):
+    if not session.get("user_id", None):
+        return redirect(url_for("login"))
+    
+    if session.get("user_type") != "G":
+        return redirect(url_for("apology", em="Only guest can book. Please login with a guiest account."))
+
+    property = database.get("SELECT * FROM properties WHERE property_id = %s", (property_id, ))[0]
+    
+    if property.get("occupied"):
+        return redirect(url_for("apology", em="Proparty is allready occupied, sorry for any inconvinience."))
+
+    query = '''
+            UPDATE properties
+            SET occupied = %s
+            WHERE property_id = %s
+            '''
+    
+    database.save(query, (True, property_id))
+
+    return redirect(url_for("view_property", property_id=property_id))
+
+
+@app.route("/unbook/<int:property_id>", methods=["POST"])
+def unbook(property_id):
+    if not session.get("user_id", None):
+        return redirect(url_for("login"))
+    
+    property = database.get("SELECT * FROM properties WHERE property_id = %s", (property_id, ))[0]
+
+    if property.get("host_id") != session.get("user_id"):
+        return redirect(url_for("apology", em="Only the property owener can unbook a proparty")) 
+    
+    if not property.get("occupied"):
+        return redirect(url_for("apology", em="Property is not booked!"))
+
+    query = '''
+            UPDATE properties
+            SET occupied = %s
+            WHERE property_id = %s
+            '''
+    
+    database.save(query, (False, property_id))
+
+    return redirect(url_for("view_property", property_id=property_id)) 
