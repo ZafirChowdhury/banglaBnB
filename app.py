@@ -149,6 +149,11 @@ def view_property(property_id):
         if len(properties) == 0:
             return redirect(url_for("apology", em="Property dose not exist"))
         
+        if properties[0].get("occupied"):
+            username = database.get("SELECT user_name FROM users WHERE user_id = %s", (properties[0].get("rented_to"), ))[0].get("user_name")
+
+            return render_template("/view_listing.html", properties=properties[0], username=username)
+        
         return render_template("/view_listing.html", properties=properties[0])
     
     if request.method == "POST":
@@ -170,11 +175,11 @@ def book(property_id):
 
     query = '''
             UPDATE properties
-            SET occupied = %s
+            SET occupied = %s, rented_to = %s
             WHERE property_id = %s
             '''
     
-    database.save(query, (True, property_id))
+    database.save(query, (True, session.get("user_id"), property_id))
 
     return redirect(url_for("view_property", property_id=property_id))
 
@@ -194,10 +199,10 @@ def unbook(property_id):
 
     query = '''
             UPDATE properties
-            SET occupied = %s
+            SET occupied = %s, rented_to = %s
             WHERE property_id = %s
             '''
     
-    database.save(query, (False, property_id))
+    database.save(query, (False, None, property_id))
 
     return redirect(url_for("view_property", property_id=property_id)) 
